@@ -1,0 +1,26 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8765:8765"
+    environment:
+      # --- Model Configuration ---
+      # This specifies the size of the Whisper model to be used.
+      # Smaller models are faster but less accurate.
+      # Examples: "tiny.en", "base", "small", "medium", "large-v3"
+      - MODEL_SIZE=large-v3
+      - DEVICE=cuda
+      - COMPUTE_TYPE=float16
+
+    # --- GPU / CPU Configuration ---
+    # To switch to CPU, comment out the 'deploy' section below and
+    # set DEVICE=cpu and COMPUTE_TYPE=int8 in the environment variables.
+
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+

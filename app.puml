@@ -1,0 +1,55 @@
+@startuml
+!theme spacelab
+
+title Streaming ASR Application Flow
+
+actor Client as C
+participant "WebSocket Server (app.py)" as S
+participant "FFmpeg Subprocess" as F
+participant "Whisper Model" as M
+
+== Server Initialization ==
+activate S
+S -> M: **Initialize WhisperModel()**\n(Loads model into memory once)
+M --> S: Model Ready
+S -> S: Start WebSocket server on port 8765
+deactivate S
+
+== Client Interaction ==
+C -> S: Establishes WebSocket connection
+activate S
+S -> S: Log "Connection established"
+
+loop For each speech utterance from client
+
+    C -> S: Sends WAV audio chunk (from VAD)
+    S -> S: **process_audio_chunk()**
+    activate S
+    '# process_audio_chunk
+
+    S -> F: Spawn FFmpeg subprocess
+    activate F
+    S -> F: Pipe WAV audio chunk to stdin
+    F -> F: Convert audio to\n16kHz mono s16le PCM
+    F --> S: Return converted audio bytes via stdout
+    deactivate F
+
+    S -> S: Convert audio bytes to NumPy array
+    S -> M: **model.transcribe(audio_array)**
+    activate M
+    M --> S: Return transcription segments
+    deactivate M
+
+    S -> S: Concatenate segments into full text
+    S -> C: Send JSON: {"transcription": "..."}
+
+    deactivate S
+    '# process_audio_chunk
+end
+
+... Client disconnects ...
+C -> S: Closes connection
+S -> S: Log "Client connection closed"
+deactivate S
+
+@enduml
