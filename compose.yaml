@@ -11,7 +11,8 @@ services:
       - MODEL_SIZE=large-v3
       - DEVICE=cuda
       - COMPUTE_TYPE=float16
-
+    volumes:
+      - model_cache:/root/.cache
     # --- GPU / CPU Configuration ---
     # To switch to CPU, comment out the 'deploy' section below and
     # set DEVICE=cpu and COMPUTE_TYPE=int8 in the environment variables.
@@ -23,4 +24,5 @@ services:
             - driver: nvidia
               count: 1
               capabilities: [gpu]
-
+volumes:
+  model_cache:
