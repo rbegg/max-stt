@@ -81,7 +81,7 @@ async def handle_http(request):
     """Serves the index.html file."""
     logging.info("HTTP request received, serving index.html.")
     try:
-        return web.FileResponse('./index.html')
+        return web.FileResponse('./src/index.html')
     except Exception as e:
         logging.error(f"Error serving index.html: {e}")
         return web.Response(status=500, text="Internal Server Error: Could not serve index.html.")

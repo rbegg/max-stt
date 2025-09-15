@@ -29,13 +29,12 @@ COPY requirements.txt .
 # Install Python packages into the virtual environment
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the application code and client HTML
-COPY app.py .
-COPY index.html .
+# Copy the application src
+COPY src/ ./src
 
 # Expose the port the app runs on
 EXPOSE 8765
 
 # Run the application
-CMD ["python", "app.py"]
+CMD ["python", "src/app.py"]
 
