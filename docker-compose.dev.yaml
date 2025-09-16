@@ -1,5 +1,8 @@
+name: stt-dev
 services:
   app:
+    image: stt-dev:latest
+    container_name: stt-dev
     build:
       target: dev
     volumes:

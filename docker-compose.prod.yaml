@@ -1,5 +1,8 @@
+name: stt-prod
 services:
   app:
+    image: stt-prod:latest
+    container_name: stt-prod
     build:
       target: prod
     ports:

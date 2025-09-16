@@ -1,6 +1,6 @@
 services:
   app:
-    image: stt:latest
+    #image: stt:latest
     build:
       context: .
       # The target stage (dev vs prod) is specified in the override files.
