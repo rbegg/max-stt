@@ -1,0 +1,7 @@
+services:
+  app:
+    build:
+      target: prod
+    ports:
+      - "80:8765"
+    restart: unless-stopped

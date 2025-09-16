@@ -1,18 +1,24 @@
 services:
   app:
-    build: .
-    ports:
-      - "8765:8765"
+    image: stt:latest
+    build:
+      context: .
+      # The target stage (dev vs prod) is specified in the override files.
+    #ports:
+    #  - "8765:8765"
     environment:
       # --- Model Configuration ---
       # This specifies the size of the Whisper model to be used.
       # Smaller models are faster but less accurate.
       # Examples: "tiny.en", "base", "small", "medium", "large-v3"
+      - APP_NAME=stt
       - MODEL_SIZE=large-v3
       - DEVICE=cuda
       - COMPUTE_TYPE=float16
+    # Shared volume with dev and prod is not usually recommended; however,
+    # the app will download the model on the first run.
     volumes:
-      - model_cache:/root/.cache
+      - model_cache:/home/appuser/.cache
     # --- GPU / CPU Configuration ---
     # To switch to CPU, comment out the 'deploy' section below and
     # set DEVICE=cpu and COMPUTE_TYPE=int8 in the environment variables.

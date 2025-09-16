@@ -1,0 +1,13 @@
+services:
+  app:
+    build:
+      target: dev
+    volumes:
+      # Mount local directories into the container for live code changes.
+      - ./src:/app/src
+      #- ./tests:/app/tests
+      #- ./data:/app/data
+    ports:
+      # Expose a port for a web server, API, etc
+      - "8765:8765"
+    restart: unless-stopped

@@ -1,0 +1,41 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/ubuntu
+{
+	"name": "stt-dev",
+	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+//	"dockerComposeFile": [
+//      "../docker-compose.yaml",
+//      "../docker-compose.dev.yaml"
+//    ],
+    "dockerComposeFile": [
+      "../docker-compose.yaml",
+      "../docker-compose.dev.yaml"
+    ],
+
+// Set the path where your project will be opened inside the container.
+// This should match where you mounted your code.
+  "workspaceFolder": "/app",
+    "service": "app",
+  	// Features to add to the dev container. More info: https://containers.dev/features.
+	// "features": {},
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+
+	// Use 'postCreateCommand' to run commands after the container is created.
+	// "postCreateCommand": "uname -a",
+
+	// Configure tool-specific properties.
+    "customizations" : {
+      "jetbrains" : {
+        "settings": {
+          "com.intellij:app:HttpConfigurable.use_proxy_pac": true,
+          "python.defaultInterpreterPath": "/app/.venv/bin/python"
+        },
+        "backend" : "pycharm"
+      }
+    },
+
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "root"
+}
