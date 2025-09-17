@@ -25,7 +25,11 @@ prod:
 prod-down:
 	docker compose -f docker-compose.yaml -f docker-compose.prod.yaml down
 
+prod-logs:
+	docker logs -f stt-prod
 
+prod-shell:
+	docker exec -it stt-prod bash
 # --- Utility Commands ---
 
 ## Stop all containers and remove volumes (cleans the cache)

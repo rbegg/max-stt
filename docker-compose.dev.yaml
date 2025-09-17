@@ -6,11 +6,16 @@ services:
     build:
       target: dev
     volumes:
-      # Mount local directories into the container for live code changes.
+      # Bind-Mount local directories into the container for live code changes.
       - ./src:/app/src
+      # Use a named volume to persist the venv and protect it from the workspace mount (pycharm).
+      - venv:/app/.venv
       #- ./tests:/app/tests
       #- ./data:/app/data
     ports:
       # Expose a port for a web server, API, etc
       - "8765:8765"
     restart: unless-stopped
+    # Define the named volume for the virtual environment
+volumes:
+  venv:

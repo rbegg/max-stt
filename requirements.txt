@@ -1,3 +1,4 @@
 faster-whisper
 aiohttp
+aiohttp-devtools
 numpy

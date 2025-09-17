@@ -1,10 +1,13 @@
 # syntax=docker/dockerfile:1
 # This first line enables the BuildKit features like cache mounts.
-ARG PYTHON_VERSION=3.11
+
+# Expects PYTHON_VERSION to be set in a compose file
+ARG PYTHON_VERSION
+ARG BASE_IMAGE=nvidia/cuda:12.3.2-cudnn9-devel-ubuntu22.04
 
 # ---- Base Stage ----
 # Use the official NVIDIA CUDA development image as a base
-FROM nvidia/cuda:12.3.2-cudnn9-devel-ubuntu22.04 as base
+FROM ${BASE_IMAGE} as base
 ARG PYTHON_VERSION
 RUN echo "The Python version is set to: python${PYTHON_VERSION}"
 
@@ -37,6 +40,9 @@ RUN apt-get update && apt-get install -y \
     ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
+# Create a standard symlink for the python executable for robustness
+RUN ln -s /usr/bin/python${PYTHON_VERSION} /usr/bin/python
+
 # Create a non-root user and group
 RUN groupadd --gid 1000 appuser && \
     useradd --uid 1000 --gid 1000 --shell /bin/bash --create-home appuser
@@ -54,10 +60,14 @@ ARG PYTHON_VERSION
 # Copy the requirements file
 COPY --chown=appuser:appuser requirements.txt .
 
+# Set the PATH to include the workspace venv for this stage
+ENV PATH="/app/.venv/bin:$PATH"
+
 # Use a cache mount to speed up pip installs across builds
+# Create the venv at its final destination and install packages
 RUN --mount=type=cache,target=/root/.cache/pip \
-    python${PYTHON_VERSION} -m venv /tmp/venv && \
-    /tmp/venv/bin/pip install --no-cache-dir -r requirements.txt
+    python -m venv /app/.venv && \
+    pip install --no-cache-dir -r requirements.txt
 
 
 
@@ -79,13 +89,15 @@ ENV PATH="/app/.venv/bin:$PATH"
 
 # Create the venv and copy pre-installed packages from the builder stage
 RUN python${PYTHON_VERSION} -m venv /app/.venv
-COPY --chown=appuser:appuser --from=builder /tmp/venv /app/.venv
-
+COPY --chown=appuser:appuser --from=builder /app/.venv /app/.venv
 
 USER appuser
 
 # Install development-specific dependencies
 #RUN pip install --no-cache-dir "pylint" "pytest" "black"
+
+# Activate the venv by default in the bash shell
+RUN echo "source /app/.venv/bin/activate" >> /home/appuser/.bashrc
 
 # Keep the container running to allow for interactive development
 CMD ["sleep", "infinity"]
@@ -96,9 +108,8 @@ CMD ["sleep", "infinity"]
 FROM base as prod
 ENV PATH="/opt/venv/bin:$PATH"
 
-# Create the venv and copy pre-installed packages from the builder stage
-RUN python${PYTHON_VERSION} -m venv /opt/venv
-COPY --chown=appuser:appuser --from=builder /tmp/venv /opt/venv
+# Copy the pre-built and correctly configured venv from the builder stage
+COPY --chown=appuser:appuser --from=builder /app/.venv /opt/venv
 
 # Copy the application src
 COPY --chown=appuser:appuser src/ ./src

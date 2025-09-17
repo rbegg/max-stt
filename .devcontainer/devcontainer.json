@@ -30,7 +30,6 @@
       "jetbrains" : {
         "settings": {
           "com.intellij:app:HttpConfigurable.use_proxy_pac": true,
-          "python.defaultInterpreterPath": "/app/.venv/bin/python"
         },
         "backend" : "pycharm"
       }
