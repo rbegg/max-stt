@@ -3,7 +3,7 @@
 
 # Expects PYTHON_VERSION to be set in a compose file
 ARG PYTHON_VERSION
-ARG BASE_IMAGE=nvidia/cuda:12.3.2-cudnn9-devel-ubuntu22.04
+ARG BASE_IMAGE=nvidia/cuda:12.3.2-cudnn9-runtime-ubuntu22.04
 
 # ---- Base Stage ----
 # Use the official NVIDIA CUDA development image as a base
