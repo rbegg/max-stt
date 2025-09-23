@@ -87,8 +87,10 @@ RUN apt-get update && apt-get install -y \
 # Set the PATH to include the workspace venv
 ENV PATH="/app/.venv/bin:$PATH"
 
+
 # Create the venv and copy pre-installed packages from the builder stage
 RUN python${PYTHON_VERSION} -m venv /app/.venv
+
 COPY --chown=appuser:appuser --from=builder /app/.venv /app/.venv
 
 USER appuser
@@ -106,10 +108,15 @@ CMD ["sleep", "infinity"]
 # ---- Production Stage ----
 # Create and activate a virtual environment
 FROM base as prod
-ENV PATH="/opt/venv/bin:$PATH"
+#ENV PATH="/opt/venv/bin:$PATH"
+#ENV PATH="/app/.venv/bin:$PATH"
 
 # Copy the pre-built and correctly configured venv from the builder stage
-COPY --chown=appuser:appuser --from=builder /app/.venv /opt/venv
+#COPY --chown=appuser:appuser --from=builder /app/.venv /opt/venv
+#COPY --chown=appuser:appuser --from=builder /app/.venv /app/.venv
+
+COPY --chown=appuser:appuser requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the application src
 COPY --chown=appuser:appuser src/ ./src
@@ -118,6 +125,7 @@ RUN mkdir -p /etc/letsencrypt
 
 USER appuser
 
-# Run the application
-CMD ["python", "src/app.py"]
+# Set the command to run the FastAPI application with Uvicorn
+CMD ["uvicorn", "src.app:app", "--host", "0.0.0.0", "--port", "80"]
+
 
