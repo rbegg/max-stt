@@ -2,7 +2,7 @@ import logging
 from aiohttp import web
 from faster_whisper import WhisperModel
 from . import config
-from .handlers import handle_http, handle_favicon, handle_websocket
+from .handlers import handle_websocket
 
 
 async def startup_model(app):
@@ -49,8 +49,6 @@ async def init_app():
     app.on_startup.append(startup_model)
 
     # Add routes from the handlers module.
-    app.router.add_get('/', handle_http)
-    app.router.add_get('/favicon.ico', handle_favicon)
     app.router.add_get('/ws', handle_websocket)
 
     return app

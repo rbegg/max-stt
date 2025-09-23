@@ -2,26 +2,6 @@ import logging
 from aiohttp import web
 from .audio_processor import process_audio_chunk
 
-async def handle_favicon(request):
-    """
-    Handler to respond to favicon requests with a "No Content" status,
-    preventing unnecessary 404 errors in the logs.
-    """
-    return web.Response(status=204)
-
-async def handle_http(request):
-    """
-    Serves the main `index.html` file for HTTP GET requests to the root URL.
-    """
-    logging.info("HTTP request received, serving index.html.")
-    try:
-        # Note: Ensure the path to index.html is correct based on your project structure.
-        # This assumes index.html is in a 'src' directory relative to where you run the app.
-        return web.FileResponse('./src/index.html')
-    except Exception as e:
-        logging.error(f"Error serving index.html: {e}")
-        return web.Response(status=500, text="Internal Server Error")
-
 async def handle_websocket(request):
     """
     Manages the WebSocket connection for real-time audio transcription.
