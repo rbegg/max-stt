@@ -15,6 +15,6 @@ DEVICE = os.environ.get("DEVICE", "cpu")
 COMPUTE_TYPE = os.environ.get("COMPUTE_TYPE", "int8")
 
 # --- Server Configuration ---
-# Defines the host and port for the web server.
+# Defines the host and port for the web-server.
 HOST = "0.0.0.0"
-PORT = 8765
+PORT = 80
