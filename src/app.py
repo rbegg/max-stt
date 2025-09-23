@@ -37,9 +37,9 @@ async def startup_model(app):
 
 async def init_app():
     """
-    Initializes and configures the aiohttp web application.
+    Initializes and configures the aiohttp web-server application.
 
-    This factory function creates the web.Application object, registers the
+    This factory function creates the web-server.Application object, registers the
     model loading function to run on startup, and sets up the routes by
     connecting URLs to their respective handlers.
     """
@@ -64,5 +64,5 @@ if __name__ == "__main__":
     # Create the application instance.
     app = init_app()
 
-    # Run the web server with settings from the config file.
+    # Run the web-server server with settings from the config file.
     web.run_app(app, host=config.HOST, port=config.PORT)

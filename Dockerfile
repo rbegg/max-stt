@@ -116,9 +116,6 @@ COPY --chown=appuser:appuser src/ ./src
 
 RUN mkdir -p /etc/letsencrypt
 
-# Expose the port the app runs on
-EXPOSE 8765
-
 USER appuser
 
 # Run the application
