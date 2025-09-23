@@ -1,5 +1,5 @@
 import logging
-import asyncio
+import json
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from faster_whisper import WhisperModel
 from . import config
@@ -63,7 +63,12 @@ async def websocket_endpoint(websocket: WebSocket):
 
             # Send the transcription result back to the client
             if transcription:
-                await websocket.send_text(transcription)
+                response_data = {
+                    "transcript": transcription,
+                    "is_final": True,
+                }
+                await websocket.send_text(json.dumps(response_data))
+
 
     except WebSocketDisconnect:
         logging.info("WebSocket connection closed.")
