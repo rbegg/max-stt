@@ -1,19 +1,25 @@
 import logging
-from aiohttp import web
+import asyncio
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from faster_whisper import WhisperModel
 from . import config
-from .handlers import handle_http, handle_favicon, handle_websocket
+from .audio_processor import process_audio_chunk
 
+# Configure logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-async def startup_model(app):
+# Global variable to hold the Whisper model instance
+model: WhisperModel | None = None
+
+app = FastAPI()
+
+@app.on_event("startup")
+async def startup_event():
     """
-    Loads the Whisper model during application startup.
-
-    This function is executed once per worker process when the application starts.
-    It initializes the WhisperModel and attaches it to the application instance
-    so it can be accessed from request handlers.
+    Loads the Whisper model into a global variable during application startup.
+    This is executed once when the FastAPI application starts.
     """
-    # Clean the model name for faster_whisper.
+    global model
     model_name = config.MODEL_SIZE.split('/')[-1].replace('faster-whisper-', '')
 
     logging.info(
@@ -21,48 +27,52 @@ async def startup_model(app):
         f"with compute_type: {config.COMPUTE_TYPE}"
     )
     try:
-        # Initialize the model with settings from the config file.
         model = WhisperModel(
             model_name,
             device=config.DEVICE,
             compute_type=config.COMPUTE_TYPE
         )
-        app['whisper_model'] = model
-        logging.info("Model loaded and attached to app context successfully.")
+        logging.info("Model loaded and ready.")
     except Exception as e:
         logging.error(f"Failed to load Whisper model: {e}")
-        # Exit if the model fails to load, as the app cannot function.
+        # Exit if the model fails to load, as the app is non-functional.
         exit(1)
 
-
-async def init_app():
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
     """
-    Initializes and configures the aiohttp web application.
-
-    This factory function creates the web.Application object, registers the
-    model loading function to run on startup, and sets up the routes by
-    connecting URLs to their respective handlers.
+    Handles WebSocket connections for real-time audio transcription.
+    It accepts a connection, receives audio chunks, processes them,
+    and sends back transcriptions.
     """
-    app = web.Application()
+    await websocket.accept()
+    logging.info("WebSocket connection established.")
 
-    # Register the model loading function to run at startup.
-    app.on_startup.append(startup_model)
+    last_processed_chunk = None
+    try:
+        while True:
+            audio_chunk = await websocket.receive_bytes()
 
-    # Add routes from the handlers module.
-    app.router.add_get('/', handle_http)
-    app.router.add_get('/favicon.ico', handle_favicon)
-    app.router.add_get('/ws', handle_websocket)
+            # Basic debouncing to avoid processing the same chunk multiple times
+            if audio_chunk == last_processed_chunk:
+                continue
+            last_processed_chunk = audio_chunk
 
-    return app
+            # Process the audio chunk using the globally loaded model
+            transcription = await process_audio_chunk(model, audio_chunk)
 
+            # Send the transcription result back to the client
+            if transcription:
+                await websocket.send_text(transcription)
+
+    except WebSocketDisconnect:
+        logging.info("WebSocket connection closed.")
+    except Exception as e:
+        logging.error(f"An error occurred in the WebSocket handler: {e}")
 
 if __name__ == "__main__":
     """
-    Main execution block to run the application.
-    This allows you to start the server directly by running `python app.py`.
+    Allows running the app directly with `python -m src.app` for development.
     """
-    # Create the application instance.
-    app = init_app()
-
-    # Run the web server with settings from the config file.
-    web.run_app(app, host=config.HOST, port=config.PORT)
+    import uvicorn
+    uvicorn.run(app, host=config.HOST, port=config.PORT)

@@ -1,24 +1,26 @@
 import asyncio
 import logging
 import numpy as np
+from faster_whisper import WhisperModel
 
-async def process_audio_chunk(request, audio_chunk):
+
+async def process_audio_chunk(model: WhisperModel, audio_chunk: bytes) -> str:
     """
     Processes a single chunk of audio data using FFmpeg and the Whisper model.
 
     This function takes a raw audio chunk, resamples it using FFmpeg, and then
-    transcribes it using the pre-loaded Whisper model attached to the application.
+    transcribes it using the provided Whisper model instance.
 
     Args:
-        request: The aiohttp request object, used to access the app's model.
+        model: The pre-loaded faster_whisper model.
         audio_chunk: The binary audio data to process.
 
     Returns:
         A string containing the transcribed text, or an empty string on error.
     """
-    # Access the pre-loaded Whisper model from the application context.
-    model = request.app['whisper_model']
-
+    if not model:
+        logging.error("Model is not loaded.")
+        return ""
     try:
         # Command to convert incoming audio to 16-bit mono PCM at 16kHz.
         ffmpeg_command = [

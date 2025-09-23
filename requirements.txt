@@ -1,4 +1,4 @@
 faster-whisper
-aiohttp
-aiohttp-devtools
 numpy
+fastapi
+uvicorn[standard]
