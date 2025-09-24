@@ -3,10 +3,10 @@ import logging
 
 # --- Logging Configuration ---
 # Sets up the basic logging format and level for the application.
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
+# logging.basicConfig(
+#     level=logging.INFO,
+#     format='%(asctime)s - %(levelname)s - %(message)s'
+# )
 
 # --- Model Configuration ---
 # These environment variables control which model is loaded and how it's run.

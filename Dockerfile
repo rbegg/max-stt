@@ -126,6 +126,6 @@ RUN mkdir -p /etc/letsencrypt
 USER appuser
 
 # Set the command to run the FastAPI application with Uvicorn
-CMD ["uvicorn", "src.app:app", "--host", "0.0.0.0", "--port", "80"]
+CMD ["uvicorn", "src.app:app","--log-level", "${STT_LOG_LEVEL:-debug}", "--host", "0.0.0.0", "--port", "80"]
 
 

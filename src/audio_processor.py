@@ -49,7 +49,10 @@ async def process_audio_chunk(model: WhisperModel, audio_chunk: bytes) -> str:
 
         # Transcribe the audio using the Whisper model.
         segments, _ = model.transcribe(audio_np, vad_filter=True)
-        transcription = " ".join(segment.text for segment in segments)
+        transcription = ""
+        for segment in segments:
+            logging.debug(f"Segment: {segment}")
+            transcription += segment.text
 
         return transcription.strip()
 
