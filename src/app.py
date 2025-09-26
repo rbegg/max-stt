@@ -64,8 +64,9 @@ async def websocket_endpoint(websocket: WebSocket):
             # Send the transcription result back to the client
             if transcription:
                 response_data = {
-                    "transcript": transcription,
-                    "is_final": True,
+                    "type": "transcription",
+                    "source": "user",
+                    "data": transcription,
                 }
                 await websocket.send_text(json.dumps(response_data))
 
