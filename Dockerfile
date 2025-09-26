@@ -32,12 +32,11 @@ WORKDIR /app
 # Prevent tzdata from asking for input during build
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Install system dependencies: Python, pip, ffmpeg
+# Install system dependencies: Python, pip
 RUN apt-get update && apt-get install -y \
     python${PYTHON_VERSION} \
     python${PYTHON_VERSION}-venv \
     python3-pip \
-    ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
 # Create a standard symlink for the python executable for robustness

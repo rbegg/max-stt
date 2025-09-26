@@ -19,10 +19,10 @@ entire application is containerized with Docker for easy setup, development, and
 ## How It Works
 
 1. **Client-Side**: A web page (`index.html`) uses JavaScript and the `vad-web` library for Voice Activity Detection (
-   VAD). When the user speaks, audio chunks are captured, encoded as WAV, and sent to the server via a WebSocket.
-2. **Backend Server**: The `aiohttp` server listens for WebSocket connections. When an audio chunk is received, it's
+   VAD). When the user speaks, audio chunks are captured, the 32bit float array is sent tothe server via a WebSocket.
+2. **Backend Server**: The `uvicorn` server listens for WebSocket connections. When an audio chunk is received, it's
    processed by the `audio_processor`.
-3. **Audio Processing**: The audio is resampled to a 16kHz mono channel format using `ffmpeg`.
+3. **Audio Processing**: The audio is loaded from 32bit float array into a numpy array.
 4. **Transcription**: The processed audio is then passed to the pre-loaded `faster-whisper` model for transcription.
 5. **Response**: The resulting text is sent back to the client through the WebSocket and displayed on the page.
 
