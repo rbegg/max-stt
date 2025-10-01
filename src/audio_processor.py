@@ -23,6 +23,7 @@ async def process_audio_chunk(model: WhisperModel, audio_chunk: bytes) -> str:
         return ""
     try:
 
+        logging.info(f"Processing audio chunk len = {len(audio_chunk)}.")
         audio_np = np.frombuffer(audio_chunk, dtype=np.float32)
 
         # Transcribe the audio using the Whisper model.
