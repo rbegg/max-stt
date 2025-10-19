@@ -37,6 +37,7 @@ RUN apt-get update && apt-get install -y \
     python${PYTHON_VERSION} \
     python${PYTHON_VERSION}-venv \
     python3-pip \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Create a standard symlink for the python executable for robustness

@@ -13,6 +13,15 @@ model: WhisperModel | None = None
 
 app = FastAPI()
 
+
+@app.get("/health")
+def health_check():
+    """
+    Checks if the application is healthy.
+    """
+    return {"status": "healthy"}
+
+
 @app.on_event("startup")
 async def startup_event():
     """
