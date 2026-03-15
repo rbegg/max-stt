@@ -1,11 +1,13 @@
 # # This first line enables the BuildKit features like cache mounts.
 ARG PYTHON_VERSION=3.11
 ARG BASE_IMAGE=nvidia/cuda:12.3.2-cudnn9-runtime-ubuntu22.04
+ARG LOG_LEVEL=info
 
 # ---- Base Stage ----
 # Use the official NVIDIA CUDA development image as a base
 FROM ${BASE_IMAGE} AS base
 ARG PYTHON_VERSION
+ARG LOG_LEVEL
 # # Expects PYTHON_VERSION to be set in a compose file
 RUN echo "The Python version is set to: python${PYTHON_VERSION}"
 
@@ -46,6 +48,7 @@ RUN mkdir -p /home/appuser/.cache && chown -R appuser:appuser /home/appuser/.cac
 # # The result is cached and reused by dev and prod, speeding up builds.
 FROM base AS builder
 ARG PYTHON_VERSION
+ARG LOG_LEVEL
 
 # Create a virtual environment at a predictable location
 RUN python -m venv /opt/venv
@@ -63,6 +66,7 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 # ---- Production Stage ----
 FROM base AS prod
 ARG PYTHON_VERSION
+ARG LOG_LEVEL
 
 # Copy the entire venv folder to avoid Python patch version naming errors
 COPY --from=builder --chown=appuser:appuser /opt/venv /opt/venv
@@ -76,7 +80,7 @@ COPY --chown=appuser:appuser src/ ./src
 # Switch to the non-root user
 USER appuser
 
-ENV LOG_LEVEL="${STT_LOG_LEVEL:-info}" \
+ENV LOG_LEVEL="$LOG_LEVEL" \
     UVICORN_PORT="80" \
     UVICORN_HOST="0.0.0.0"
 
@@ -100,7 +104,7 @@ ENV PATH="/opt/venv/bin:$PATH"
 # Switch to the non-root user
 USER appuser
 
-ENV LOG_LEVEL="${STT_LOG_LEVEL:-info}" \
+ENV LOG_LEVEL="$LOG_LEVEL" \
     UVICORN_PORT="80" \
     UVICORN_HOST="0.0.0.0"
 
