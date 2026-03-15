@@ -10,8 +10,8 @@ ARG PYTHON_VERSION
 RUN echo "The Python version is set to: python${PYTHON_VERSION}"
 
 # Set environment variables for Python
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE=1
+ENV PYTHONUNBUFFERED=1
 
 # Set environment variables for default execution
 ENV DEVICE=cuda
